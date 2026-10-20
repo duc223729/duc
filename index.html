@@ -103,7 +103,7 @@ async function sendPost(){
 var c=document.getElementById("p_content").value.trim();
 if(!c){alert("Viết gì đó đã rồi đăng.");return;}
 var m=document.getElementById("p_mood").value;
-var r=await fetch("/api/post",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:token,content:c,mood:m,image:imgData})});
+var r=await fetch("/api/posts",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:token,content:c,mood:m,image:imgData})});
 var d=await r.json();
 if(d.ok){document.getElementById("p_content").value="";imgData="";document.getElementById("p_prev").classList.add("hidden");loadFeed();}
 else alert(d.error||"Đăng thất bại.");

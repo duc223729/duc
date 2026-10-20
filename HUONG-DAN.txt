@@ -1,9 +1,6 @@
-TRIEN KHAI WEB TAM SU LEN VERCEL
-==============================
-1. Tai toan bo thu muc tam-su-vercel len kho GitHub.
-2. Vao vercel.com > Add New > Project > chon kho > Deploy.
-3. Vao Storage > Create > Upstash for Redis > dat ten tamsu-kv
-   > Connect vao project.
-4. Vao Deployments > Redeploy ban moi nhat.
-5. Mo dia chi ten-project.vercel.app la dung.
-Khong can mua ten mien. Tat may ca nhan web van chay.
+TRIEN KHAI WEB TAM SU LEN VERCEL (ban sua loi API)
+==================================================
+1. Tai toan bo thu muc tam-su-vercel len kho GitHub de len code cu.
+2. Vercel tu deploy lai. Vao Deployments cho hien Ready.
+3. Mo dia chi ten-project.vercel.app, dang ky thu, dang bai thu.
+Da sua: nut Dang tam su goi dung /api/posts (ban cu goi nham /api/post).

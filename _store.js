@@ -1,6 +1,5 @@
 import { Redis } from '@upstash/redis';
 import crypto from 'crypto';
-
 const redis = Redis.fromEnv();
 export const dbGet = async (k, fb) => (await redis.get(k)) ?? fb;
 export const dbSet = (k, v) => redis.set(k, v);
