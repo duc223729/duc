@@ -1,26 +1,9 @@
-TRIEN KHAI WEB TAM SU LEN VERCEL - ten mien tamsu360.com
-=====================================================
-
-CACH LAM (5 buoc):
-
-1. Tao kho GitHub, tai toan bo thu muc tam-su-vercel len
-   (index.html, package.json, vercel.json, thu muc api/).
-
-2. Vao https://vercel.com, dang nhap, nhan Add New > Project,
-   chon kho vua tao, nhan Deploy.
-
-3. Tao kho du lieu: vao Storage > Create Database > KV (Upstash),
-   chon gan vao project. Vercel tu nap bien moi truong.
-
-4. Gan ten mien: vao Project > Settings > Domains,
-   nhap tamsu360.com (ban phai so huu ten mien nay),
-   lam theo huong dan tro DNS tu nha cung cap ten mien.
-
-5. Mo https://tamsu360.com la dung. May chu that tren cloud,
-   tat may ca nhan web van chay, khong can tunnel.
-
-LUU Y:
-- Ten mien tamsu360.com phai mua rieng (VD Namecheap, GoDaddy),
-  Vercel khong cap mien .com mien phi.
-- Neu chua mua mien, cu dung mien mien phi dang
-  ten-project.vercel.app truoc.
+TRIEN KHAI WEB TAM SU LEN VERCEL
+==============================
+1. Tai toan bo thu muc tam-su-vercel len kho GitHub.
+2. Vao vercel.com > Add New > Project > chon kho > Deploy.
+3. Vao Storage > Create > Upstash for Redis > dat ten tamsu-kv
+   > Connect vao project.
+4. Vao Deployments > Redeploy ban moi nhat.
+5. Mo dia chi ten-project.vercel.app la dung.
+Khong can mua ten mien. Tat may ca nhan web van chay.
