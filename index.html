@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tâm Sự - Góc Chia Sẻ Như Yahoo Xưa</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Arial,sans-serif;background:#e9edf3;color:#1c1e21}
+.top{background:linear-gradient(135deg,#4a00e0,#8e2de2);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+.top h1{font-size:1.2rem}
+.top button{background:rgba(255,255,255,.2);border:1px solid #fff;color:#fff;padding:6px 14px;border-radius:999px;cursor:pointer}
+.wrap{max-width:640px;margin:0 auto;padding:16px}
+.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+input,textarea,select{width:100%;padding:10px;border:1.5px solid #ccd0d5;border-radius:8px;font-size:1rem;font-family:inherit;margin-top:8px}
+textarea{min-height:90px;resize:vertical}
+.btn{background:linear-gradient(135deg,#4a00e0,#8e2de2);color:#fff;border:none;padding:11px;border-radius:999px;font-size:1rem;width:100%;margin-top:10px;cursor:pointer;font-weight:700}
+.link{color:#8e2de2;cursor:pointer;text-align:center;display:block;margin-top:10px}
+.post .head{display:flex;justify-content:space-between;align-items:center}
+.post .nick{font-weight:700;color:#4a00e0}
+.post .time{font-size:.75rem;color:#65676b}
+.post .body{margin:8px 0;white-space:pre-wrap}
+.post img{max-width:100%;border-radius:8px;margin-top:8px}
+.mood{display:inline-block;background:#f0e6ff;color:#4a00e0;font-size:.75rem;padding:2px 10px;border-radius:999px;margin-top:6px}
+.actions{display:flex;gap:8px;margin-top:10px}
+.actions button{flex:1;border:1px solid #ccd0d5;background:#f5f6f7;border-radius:999px;padding:6px;cursor:pointer}
+.cmt{background:#f0f2f5;border-radius:8px;padding:8px 10px;margin-top:8px;font-size:.9rem}
+.cmt b{color:#4a00e0}
+.cmtbox{display:flex;gap:6px;margin-top:8px}
+.cmtbox input{margin-top:0}
+.cmtbox button{border:none;background:#8e2de2;color:#fff;border-radius:8px;padding:0 14px;cursor:pointer}
+.hidden{display:none}
+.err{color:#e74c3c;text-align:center;margin-top:8px;font-size:.9rem}
+.preview{max-width:100%;border-radius:8px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="top"><h1>Tâm Sự 360</h1><button id="logoutBtn" class="hidden" onclick="logout()">Đăng xuất</button></div>
+<div class="wrap">
+<div class="card" id="authCard">
+<div id="loginBox">
+<h2>Đăng nhập</h2>
+<input id="li_user" placeholder="Tên đăng nhập">
+<input id="li_pw" type="password" placeholder="Mật khẩu">
+<button class="btn" onclick="login()">Đăng nhập</button>
+<span class="link" onclick="show('reg')">Chưa có tài khoản? Đăng ký ngay</span>
+<div class="err" id="li_err"></div>
+</div>
+<div id="regBox" class="hidden">
+<h2>Đăng ký tài khoản</h2>
+<input id="rg_user" placeholder="Tên đăng nhập (a-z, 0-9, ít nhất 3 ký tự)">
+<input id="rg_name" placeholder="Tên hiển thị (không trùng ai)">
+<input id="rg_pw" type="password" placeholder="Mật khẩu (ít nhất 4 ký tự)">
+<button class="btn" onclick="register()">Đăng ký</button>
+<span class="link" onclick="show('login')">Đã có tài khoản? Quay lại đăng nhập</span>
+<div class="err" id="rg_err"></div>
+</div>
+</div>
+<div class="card hidden" id="postCard">
+<h3>Chào <span id="hello"></span>, hôm nay bạn thế nào?</h3>
+<textarea id="p_content" placeholder="Viết tâm sự của bạn tại đây..."></textarea>
+<select id="p_mood"><option value="">Không gắn cảm xúc</option><option>Vui</option><option>Buồn</option><option>Cần lời khuyên</option><option>Nhớ ai đó</option><option>Cô đơn</option><option>Tâm trạng</option></select>
+<input type="file" id="p_img" accept="image/*">
+<img id="p_prev" class="preview hidden">
+<button class="btn" onclick="sendPost()">Đăng tâm sự</button>
+</div>
+<div id="feed"></div>
+</div>
+<script>
+var token=localStorage.getItem("tamsu_token")||"";
+var myname=localStorage.getItem("tamsu_name")||"";
+var imgData="";
+function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function show(w){document.getElementById("loginBox").classList.toggle("hidden",w!=="login");document.getElementById("regBox").classList.toggle("hidden",w!=="reg");}
+document.getElementById("p_img").addEventListener("change",function(e){
+var f=e.target.files[0];if(!f)return;
+if(f.size>500000){alert("Ảnh quá lớn, chọn ảnh dưới 500KB.");return;}
+var r=new FileReader();
+r.onload=function(){imgData=r.result;var p=document.getElementById("p_prev");p.src=imgData;p.classList.remove("hidden");};
+r.readAsDataURL(f);
+});
+async function register(){
+var u=document.getElementById("rg_user").value.trim();
+var n=document.getElementById("rg_name").value.trim();
+var p=document.getElementById("rg_pw").value;
+var e=document.getElementById("rg_err");e.textContent="";
+var r=await fetch("/api/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,displayname:n,password:p})});
+var d=await r.json();
+if(d.ok){alert("Đăng ký thành công! Quay lại đăng nhập.");show("login");}
+else e.textContent=d.error||"Đăng ký thất bại.";
+}
+async function login(){
+var u=document.getElementById("li_user").value.trim();
+var p=document.getElementById("li_pw").value;
+var e=document.getElementById("li_err");e.textContent="";
+var r=await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u,password:p})});
+var d=await r.json();
+if(d.ok){token=d.token;myname=d.displayname;localStorage.setItem("tamsu_token",token);localStorage.setItem("tamsu_name",myname);boot();}
+else e.textContent="Sai tên đăng nhập hoặc mật khẩu.";
+}
+function logout(){token="";myname="";localStorage.removeItem("tamsu_token");localStorage.removeItem("tamsu_name");boot();}
+async function sendPost(){
+var c=document.getElementById("p_content").value.trim();
+if(!c){alert("Viết gì đó đã rồi đăng.");return;}
+var m=document.getElementById("p_mood").value;
+var r=await fetch("/api/post",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:token,content:c,mood:m,image:imgData})});
+var d=await r.json();
+if(d.ok){document.getElementById("p_content").value="";imgData="";document.getElementById("p_prev").classList.add("hidden");loadFeed();}
+else alert(d.error||"Đăng thất bại.");
+}
+async function sendCmt(id){
+var el=document.getElementById("c_"+id);
+var t=el.value.trim();if(!t)return;
+await fetch("/api/comment",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:token,postId:id,text:t})});
+loadFeed();
+}
+async function like(id){
+await fetch("/api/like",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({token:token,postId:id})});
+loadFeed();
+}
+function toggleCmt(id){var b=document.getElementById("cb_"+id);b.classList.toggle("hidden");}
+async function loadFeed(){
+var r=await fetch("/api/posts");var posts=await r.json();
+var f=document.getElementById("feed");f.innerHTML="";
+posts.forEach(function(p){
+var d=document.createElement("div");d.className="card post";
+var h='<div class="head"><span class="nick">'+esc(p.displayname)+' <small style="color:#65676b">@'+esc(p.user)+'</small></span><span class="time">'+esc(p.time)+'</span></div>';
+if(p.mood)h+='<span class="mood">'+esc(p.mood)+'</span>';
+h+='<div class="body">'+esc(p.content)+'</div>';
+if(p.image)h+='<img src="'+p.image+'">';
+var lc=(p.likes||[]).length;
+h+='<div class="actions"><button onclick="like('+p.id+')">Thích ('+lc+')</button><button onclick="toggleCmt('+p.id+')">Bình luận ('+(p.comments||[]).length+')</button></div>';
+h+='<div id="cb_'+p.id+'" class="hidden">';
+(p.comments||[]).forEach(function(c){h+='<div class="cmt"><b>'+esc(c.displayname)+':</b> '+esc(c.text)+'</div>';});
+h+='<div class="cmtbox"><input id="c_'+p.id+'" placeholder="Viết lời khuyên, bình luận..."><button onclick="sendCmt('+p.id+')">Gửi</button></div></div>';
+d.innerHTML=h;f.appendChild(d);
+});
+}
+function boot(){
+var logged=!!token;
+document.getElementById("authCard").classList.toggle("hidden",logged);
+document.getElementById("postCard").classList.toggle("hidden",!logged);
+document.getElementById("logoutBtn").classList.toggle("hidden",!logged);
+if(logged)document.getElementById("hello").textContent=myname;
+loadFeed();
+}
+boot();
+setInterval(function(){loadFeed();},8000);
+</script>
+</body>
+</html>
